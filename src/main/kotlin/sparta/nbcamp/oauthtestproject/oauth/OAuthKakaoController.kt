@@ -49,7 +49,7 @@ class OAuthKakaoController(
         return accessTokenResponse.toString()
     }
 
-    @PostMapping("/oauth2/kakao/user")
+    @GetMapping("/oauth2/kakao/user")
     @ResponseBody
     fun getKakaoUser(
         @RequestParam accessToken: String,
