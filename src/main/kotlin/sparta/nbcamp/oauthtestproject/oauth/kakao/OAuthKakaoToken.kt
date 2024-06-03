@@ -1,4 +1,4 @@
-package sparta.nbcamp.oauthtestproject.oauth
+package sparta.nbcamp.oauthtestproject.oauth.kakao
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

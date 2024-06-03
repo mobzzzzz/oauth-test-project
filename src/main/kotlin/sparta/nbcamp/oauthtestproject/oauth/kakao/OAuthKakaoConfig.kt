@@ -1,4 +1,4 @@
-package sparta.nbcamp.oauthtestproject.oauth
+package sparta.nbcamp.oauthtestproject.oauth.kakao
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
