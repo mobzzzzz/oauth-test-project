@@ -11,13 +11,13 @@ import org.springframework.web.client.RestTemplate
 
 @Controller
 class OAuthKakaoController(
-    private val OAuthKakaoConfig: OAuthKakaoConfig
+    private val oauthKakaoConfig: OAuthKakaoConfig
 ) {
     @GetMapping("/oauth2/kakao/login")
     fun getKakaoToken(): String {
         val kakaoLoginUrl = "https://kauth.kakao.com/oauth/authorize" +
-                "?client_id=${OAuthKakaoConfig.clientId}" +
-                "&redirect_uri=${OAuthKakaoConfig.redirectUri}" +
+                "?client_id=${oauthKakaoConfig.clientId}" +
+                "&redirect_uri=${oauthKakaoConfig.redirectUri}" +
                 "&response_type=code"
 
         return "redirect:$kakaoLoginUrl"
@@ -28,8 +28,8 @@ class OAuthKakaoController(
     fun getKakaoRedirect(code: String): String {
         val params: MultiValueMap<String, String> = LinkedMultiValueMap()
         params["grant_type"] = "authorization_code"
-        params["client_id"] = OAuthKakaoConfig.clientId
-        params["redirect_uri"] = OAuthKakaoConfig.redirectUri
+        params["client_id"] = oauthKakaoConfig.clientId
+        params["redirect_uri"] = oauthKakaoConfig.redirectUri
         params["code"] = code
 
         val headersForAccessToken = HttpHeaders()
