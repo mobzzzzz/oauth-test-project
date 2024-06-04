@@ -4,7 +4,7 @@ import sparta.nbcamp.oauthtestproject.user.model.User
 
 data class UserDto(
     val id: Long,
-    val email: String,
+    val email: String?,
     val provider: String?,
     val providerId: String?,
     val nickname: String,

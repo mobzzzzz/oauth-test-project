@@ -1,17 +1,21 @@
 package sparta.nbcamp.oauthtestproject.oauth.kakao
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.*
 import org.springframework.stereotype.Controller
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.client.RestTemplate
+import sparta.nbcamp.oauthtestproject.user.service.UserService
 
 
 @Controller
 class OAuthKakaoController(
-    private val oauthKakaoConfig: OAuthKakaoConfig
+    private val oauthKakaoConfig: OAuthKakaoConfig,
+
+    private val userService: UserService
 ) {
     @GetMapping("/oauth2/kakao/login")
     fun getKakaoToken(): String {
@@ -53,7 +57,7 @@ class OAuthKakaoController(
     @ResponseBody
     fun getKakaoUser(
         @RequestParam accessToken: String,
-    ): ResponseEntity<String> {
+    ): ResponseEntity<Any> {
         val header = HttpHeaders()
         header.contentType = MediaType.APPLICATION_FORM_URLENCODED
         header["Authorization"] = "Bearer $accessToken"
@@ -62,15 +66,21 @@ class OAuthKakaoController(
 
         val restTemplate = RestTemplate()
 
-        val userResponse = restTemplate.exchange(
+        val response = restTemplate.exchange(
             "https://kapi.kakao.com/v2/user/me",
             HttpMethod.GET,
             userRequest,
-            String::class.java
+            OAuthKakaoResponse::class.java
         )
 
-        val jsonNode = ObjectMapper().readTree(userResponse.body ?: "")
+        val id = response.body?.id ?: throw IllegalStateException("User id not found with kakao")
 
-        return ResponseEntity.ok(jsonNode.toString())
+        if (userService.existsByProviderAndProviderId("kakao", id)) {
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.signInWithKakao(response.body!!))
+        } else {
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.signUpWithKakao(response.body!!))
+        }
     }
 }

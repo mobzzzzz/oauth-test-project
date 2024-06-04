@@ -1,6 +1,7 @@
 package sparta.nbcamp.oauthtestproject.user.service
 
 import org.springframework.stereotype.Service
+import sparta.nbcamp.oauthtestproject.oauth.kakao.OAuthKakaoResponse
 import sparta.nbcamp.oauthtestproject.oauth.naver.OAuthNaverResponse
 import sparta.nbcamp.oauthtestproject.user.dto.UserDto
 import sparta.nbcamp.oauthtestproject.user.model.User
@@ -10,6 +11,22 @@ import sparta.nbcamp.oauthtestproject.user.repository.UserRepository
 class UserServiceImpl(
     val userRepository: UserRepository
 ) : UserService {
+    override fun signUpWithKakao(oauthKakaoResponse: OAuthKakaoResponse) {
+        userRepository.save(
+            User.from(
+                oauthKakaoResponse = oauthKakaoResponse,
+                password = generateRandomPassword(),
+            )
+        )
+    }
+
+    override fun signInWithKakao(oauthKakaoResponse: OAuthKakaoResponse): UserDto {
+        return UserDto.from(
+            userRepository.findByProviderAndProviderId("kakao", oauthKakaoResponse.id)
+                ?: throw IllegalArgumentException("User not found")
+        )
+    }
+
     override fun signUpWithNaver(oauthNaverResponse: OAuthNaverResponse) {
         userRepository.save(
             User.from(

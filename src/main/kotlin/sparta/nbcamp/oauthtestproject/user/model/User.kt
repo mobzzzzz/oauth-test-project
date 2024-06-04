@@ -1,6 +1,7 @@
 package sparta.nbcamp.oauthtestproject.user.model
 
 import jakarta.persistence.*
+import sparta.nbcamp.oauthtestproject.oauth.kakao.OAuthKakaoResponse
 import sparta.nbcamp.oauthtestproject.oauth.naver.OAuthNaverResponse
 
 @Entity
@@ -14,7 +15,7 @@ data class User(
     val providerId: String?,
 
     @Column(unique = true)
-    val email: String,
+    val email: String?,
 
     @Column
     val password: String,
@@ -40,6 +41,20 @@ data class User(
                 nickname = oauthNaverResponse.userResponse.nickname,
                 profileImageUrl = oauthNaverResponse.userResponse.profileImageUrl,
                 provider = "naver"
+            )
+        }
+
+        fun from(
+            oauthKakaoResponse: OAuthKakaoResponse,
+            password: String,
+        ): User {
+            return User(
+                providerId = oauthKakaoResponse.id,
+                email = null,
+                password = password,
+                nickname = oauthKakaoResponse.userResponse.nickname,
+                profileImageUrl = oauthKakaoResponse.userResponse.profileImageUrl,
+                provider = "kakao"
             )
         }
     }
