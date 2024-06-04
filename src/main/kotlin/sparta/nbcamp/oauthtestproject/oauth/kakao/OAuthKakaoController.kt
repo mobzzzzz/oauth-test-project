@@ -50,7 +50,7 @@ class OAuthKakaoController(
             OAuthKakaoToken::class.java
         )
 
-        return accessTokenResponse.toString()
+        return accessTokenResponse.body?.accessToken.toString()
     }
 
     @GetMapping("/oauth2/kakao/user")

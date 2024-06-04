@@ -61,7 +61,7 @@ class OAuthNaverController(
             OAuthNaverToken::class.java
         )
 
-        return accessTokenResponse.toString()
+        return accessTokenResponse.body?.accessToken.toString()
     }
 
     @GetMapping("/oauth2/naver/user")
