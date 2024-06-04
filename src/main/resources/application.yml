@@ -12,7 +12,7 @@ naver:
     uri: "http://localhost:8080/oauth2/naver/callback"
 
 server:
-  port: 80
+  port: 8080
 
 spring:
   datasource:
