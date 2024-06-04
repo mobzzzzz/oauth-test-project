@@ -1,4 +1,10 @@
-# Sequence diagram
+# OAuth 테스트 프로젝트
+
+Kotlin을 사용해 OAuth2 인증을 테스트하는 프로젝트입니다.
+
+유저 데이터는 H2 데이터베이스를 사용해 메모리에 저장하고 실행할 때마다 초기화됩니다
+
+## Sequence diagram
 
 ```mermaid
 sequenceDiagram
