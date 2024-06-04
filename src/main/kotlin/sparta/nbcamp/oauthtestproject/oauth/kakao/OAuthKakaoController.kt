@@ -25,7 +25,7 @@ class OAuthKakaoController(
 
     @GetMapping("/oauth2/kakao/callback")
     @ResponseBody
-    fun getKakaoRedirect(code: String): String {
+    fun getKakaoRedirect(@RequestParam code: String): String {
         val params: MultiValueMap<String, String> = LinkedMultiValueMap()
         params["grant_type"] = "authorization_code"
         params["client_id"] = oauthKakaoConfig.clientId
