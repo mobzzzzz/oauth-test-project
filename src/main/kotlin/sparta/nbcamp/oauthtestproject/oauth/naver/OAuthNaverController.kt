@@ -1,6 +1,5 @@
 package sparta.nbcamp.oauthtestproject.oauth.naver
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpSession
 import org.springframework.http.*
 import org.springframework.stereotype.Controller
@@ -10,12 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.client.RestTemplate
+import sparta.nbcamp.oauthtestproject.user.service.UserService
 import java.math.BigInteger
 import java.security.SecureRandom
 
 @Controller
 class OAuthNaverController(
-    val oauthNaverConfig: OAuthNaverConfig
+    private val oauthNaverConfig: OAuthNaverConfig,
+
+    private val userService: UserService
 ) {
 
     @GetMapping("/oauth2/naver/login")
@@ -23,7 +25,7 @@ class OAuthNaverController(
         val state = generateState()
         session.setAttribute("state", state)
 
-        val naverLoginUrl = "https://nid.naver.com/oauth2.0/authorize" +
+        val naverLoginUrl = oauthNaverConfig.authorizationCodeUrl +
                 "?client_id=${oauthNaverConfig.clientId}" +
                 "&redirect_uri=${oauthNaverConfig.redirectUri}" +
                 // CSRF 공격 방지를 위한 교차 체크용 상태 토큰, https://developers.naver.com/docs/login/web/web.md
@@ -53,7 +55,7 @@ class OAuthNaverController(
         val restTemplate = RestTemplate()
 
         val accessTokenResponse = restTemplate.exchange(
-            "https://nid.naver.com/oauth2.0/token",
+            oauthNaverConfig.tokenUrl,
             HttpMethod.POST,
             naverTokenRequest,
             OAuthNaverToken::class.java
@@ -66,7 +68,7 @@ class OAuthNaverController(
     @ResponseBody
     fun getNaverUser(
         @RequestParam accessToken: String,
-    ): ResponseEntity<String> {
+    ): ResponseEntity<Any> {
         val header = HttpHeaders()
         header.contentType = MediaType.APPLICATION_FORM_URLENCODED
         header["Authorization"] = "Bearer $accessToken"
@@ -75,16 +77,22 @@ class OAuthNaverController(
 
         val restTemplate = RestTemplate()
 
-        val userResponse = restTemplate.exchange(
-            "https://openapi.naver.com/v1/nid/me",
+        val response = restTemplate.exchange(
+            oauthNaverConfig.profileUrl,
             HttpMethod.GET,
             userRequest,
-            String::class.java
+            OAuthNaverResponse::class.java
         )
 
-        val jsonNode = ObjectMapper().readTree(userResponse.body ?: "")
+        val id = response.body?.userResponse?.id ?: throw IllegalStateException("User id not found with naver")
 
-        return ResponseEntity.ok(jsonNode.toString())
+        if (userService.existsByProviderAndProviderId("naver", id)) {
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.signInWithNaver(response.body!!))
+        } else {
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.signUpWithNaver(response.body!!))
+        }
     }
 
     private fun generateState(): String {
