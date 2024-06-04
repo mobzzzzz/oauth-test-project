@@ -87,8 +87,10 @@ class OAuthNaverController(
         val id = response.body?.userResponse?.id ?: throw IllegalStateException("User id not found with naver")
 
         if (userService.existsByProviderAndProviderId("naver", id)) {
+            userService.signInWithNaver(response.body!!)
+
             return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.signInWithNaver(response.body!!))
+                .body("Successfully signed up with Naver")
         } else {
             return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.signUpWithNaver(response.body!!))

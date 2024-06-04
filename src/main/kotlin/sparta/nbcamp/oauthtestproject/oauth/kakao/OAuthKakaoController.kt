@@ -76,8 +76,10 @@ class OAuthKakaoController(
         val id = response.body?.id ?: throw IllegalStateException("User id not found with kakao")
 
         if (userService.existsByProviderAndProviderId("kakao", id)) {
+            userService.signInWithKakao(response.body!!)
+
             return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.signInWithKakao(response.body!!))
+                .body("Successfully signed up with Kakao")
         } else {
             return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.signUpWithKakao(response.body!!))
