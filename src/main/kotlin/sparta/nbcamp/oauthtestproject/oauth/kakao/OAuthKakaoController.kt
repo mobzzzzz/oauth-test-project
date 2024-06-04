@@ -19,7 +19,7 @@ class OAuthKakaoController(
 ) {
     @GetMapping("/oauth2/kakao/login")
     fun getKakaoToken(): String {
-        val kakaoLoginUrl = "https://kauth.kakao.com/oauth/authorize" +
+        val kakaoLoginUrl = oauthKakaoConfig.authorizationCodeUrl +
                 "?client_id=${oauthKakaoConfig.clientId}" +
                 "&redirect_uri=${oauthKakaoConfig.redirectUri}" +
                 "&response_type=code"
@@ -44,7 +44,7 @@ class OAuthKakaoController(
         val restTemplate = RestTemplate()
 
         val accessTokenResponse = restTemplate.exchange(
-            "https://kauth.kakao.com/oauth/token",
+            oauthKakaoConfig.tokenUrl,
             HttpMethod.POST,
             kakaoTokenRequest,
             OAuthKakaoToken::class.java
@@ -67,7 +67,7 @@ class OAuthKakaoController(
         val restTemplate = RestTemplate()
 
         val response = restTemplate.exchange(
-            "https://kapi.kakao.com/v2/user/me",
+            oauthKakaoConfig.profileUrl,
             HttpMethod.GET,
             userRequest,
             OAuthKakaoResponse::class.java
