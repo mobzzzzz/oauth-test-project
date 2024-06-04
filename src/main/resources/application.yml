@@ -3,3 +3,10 @@ kakao:
     id: "10fea61c27520fa86be5ee9bb25e158b"
   redirect:
     uri: "http://localhost:8080/oauth2/kakao/callback"
+
+naver:
+  client:
+    id: "qWh_rcXFfAta4rJPdMSC"
+    secret: "NlBQNaIMN0"
+  redirect:
+    uri: "http://localhost:8080/oauth2/naver/callback"
